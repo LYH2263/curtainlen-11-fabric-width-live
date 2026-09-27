@@ -14,3 +14,15 @@ def get_fabric(fid: int):
         return dict(r) if r else None
     finally:
         c.close()
+
+def update_fabric_width(fid: int, fabric_width: float):
+    c = connect()
+    try:
+        cur = c.execute("UPDATE fabrics SET fabric_width=? WHERE id=?", (float(fabric_width), fid))
+        c.commit()
+        if cur.rowcount == 0:
+            return None
+        r = c.execute("SELECT * FROM fabrics WHERE id=?", (fid,)).fetchone()
+        return dict(r) if r else None
+    finally:
+        c.close()

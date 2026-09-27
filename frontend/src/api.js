@@ -8,3 +8,11 @@ export async function postJSON(path, body) {
   if (!r.ok) throw new Error(await r.text())
   return r.json()
 }
+export async function patchJSON(path, body) {
+  const r = await fetch(path, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+  if (!r.ok) throw new Error(tryMsg(r))
+  return r.json()
+}
+async function tryMsg(r) {
+  try { const d = await r.json(); return d.detail || JSON.stringify(d) } catch { return r.statusText }
+}
