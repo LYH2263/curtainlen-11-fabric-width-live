@@ -11,6 +11,10 @@ def run_estimate(window_id: int, fabric_id: int, save: bool, note: str):
         raise HTTPException(422, "dirty window")
     settings = settings_repo.get_all()
     fullness = float(w.get("fullness") or settings.get("default_fullness", 2.0))
-    calc = fabric_meters(w["width"], w["height"], fullness, f["hem_top"], f["hem_bottom"], f["fabric_width"])
+    try:
+        calc = fabric_meters(w["width"], w["height"], fullness, f["hem_top"], f["hem_bottom"], f["fabric_width"])
+    except ValueError as e:
+        raise HTTPException(422, str(e))
     run_id = history.insert_run(window_id, fabric_id, calc, note) if save else None
+    # calc["fabric_width"] 与 fabric 行同源于本次读取的 f，列表/下拉/试算回包读到的是同一个库值
     return {"window": w, "fabric": f, "run_id": run_id, **calc}
